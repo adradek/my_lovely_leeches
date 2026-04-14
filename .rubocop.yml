@@ -1,8 +1,53 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
-
-# Overwrite or add rules to create your own house style
+# TODO: Look through and uncomment if needed
 #
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+# # Omakase Ruby styling for Rails
+# inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+
+# # Overwrite or add rules to create your own house style
+# #
+# # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
+# # Layout/SpaceInsideArrayLiteralBrackets:
+# #   Enabled: false
+
+inherit_mode:
+  # Exclude instructions are merged, not overwritten
+  merge:
+    - Exclude
+
+require:
+  - standard
+
+plugins:
+  - standard-custom
+  - standard-performance
+  - rubocop-rails
+  - rubocop-performance
+  - rubocop-rspec
+
+inherit_gem:
+  standard: config/ruby-3.4.yml
+  standard-performance: config/base.yml
+  standard-custom: config/base.yml
+  standard-rails: config/base.yml
+
+inherit_from:
+  - .rubocop_todo.yml
+  - .rubocop_strict.yml
+
+
+# Sometimes we enable metrics cops
+# (which are disabled in Standard by default)
+#
+# Metrics:
+#   Enabled: true
+
+# Global options, like Ruby version
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 4.0
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: space
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 8

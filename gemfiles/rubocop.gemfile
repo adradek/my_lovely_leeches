@@ -1,0 +1,12 @@
+source "https://rubygems.org" do
+  # TODO: Learn what to do with rubocop-omakase
+  # # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  # gem "rubocop-rails-omakase", require: false
+
+  gem "rubocop"
+  gem "rubocop-performance"
+  gem "rubocop-rspec"
+  gem "standard", "~> 1.33"
+  gem "standard-rails"
+  gem "standard-performance"
+end
