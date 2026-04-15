@@ -19,7 +19,7 @@ raw_taxons = <<~TEXT
   тип Cnidaria
   класс Hydrozoa
   сем. Hydridae
-  Hydra sp. (о-b) **
+  Hydra sp. (o-b) **
   тип Nematoda
   Nematoda n.det.
   тип Annelida
@@ -71,9 +71,9 @@ raw_taxons = <<~TEXT
   сем. Bithyniidae
   Bithynia (Opistorchophorus) troschelii (Paasch, 1842)
   Bithynia (Bithynia) tentaculata (Linnaeus, 1758)(b)
-  Bithynia (Codiella) leachii (Sheppard, 1823)(о-b)
+  Bithynia (Codiella) leachii (Sheppard, 1823)(o-b)
   сем. Acroloxidae
-  Acroloxus (Acroloxus) lacustris (Linnaeus, 1758) (о-b)
+  Acroloxus (Acroloxus) lacustris (Linnaeus, 1758) (o-b)
   сем. Lymnaeidae
   Stagnicola (Stagnicola) palustris (O.F. Müller, 1774)
   Radix (Radix) parapsilia Vinarski et Glöer, 2009
@@ -81,7 +81,7 @@ raw_taxons = <<~TEXT
   Galba (Galba) truncatula (O.F. Müller, 1774)
   сем. Planorbidae
   Planorbarius corneus (Linnaeus, 1758) (b)
-  Armiger crista (Linnaeus, 1758) (о)
+  Armiger crista (Linnaeus, 1758) (o)
   Lamorbis riparius (Westerlund, 1865)
   Hippeutis complanatus (Linnaeus, 1758)
   Segmentina nitida (O.F. Müller, 1774)
@@ -92,10 +92,10 @@ raw_taxons = <<~TEXT
   Gyraulus sp.
   тип Arthropoda
   класс Arachnida
-  Hydrachnidia n.det.
-  Crustacea
+  п/отряд Hydrachnidia n.det.
+  класс Crustacea
   п/класс Cladocera n.det.
-  класс Сopepoda n.det.
+  класс Copepoda n.det.
   п/класс Branchiura
   сем. Argulidae
   Argulus  sp.
@@ -105,11 +105,11 @@ raw_taxons = <<~TEXT
   класс Insecta
   отряд Ephemeroptera
   сем. Baetidae
-  Сloeon гр. diptrerum Linnaeus, 1761 (о-a)
-  Сloeon sp. (juv.)
+  Cloeon diptrerum Linnaeus, 1761 (o-a)
+  Cloeon sp. (juv.)
   сем. Caenidae
   Caenis robusta Eaton, 1884
-  C. horaria (Linnaeus, 1758) (о)
+  C. horaria (Linnaeus, 1758) (o)
   C. laceta (Burmeister, 1839)
   Caenis sp. (juv.)
   отряд Odonata
@@ -129,8 +129,8 @@ raw_taxons = <<~TEXT
   Plea minutissima Leach,1817
   отряд Coleoptera
   сем. Haliplidae
-  Haliplus sp. (imago) (о-b)
-  Haliplus sp. (larv.)  (о-b)
+  Haliplus sp. (imago) (o-b)
+  Haliplus sp. (larv.)  (o-b)
   сем. Noteridae
   Noterus crassicornis (O.F. Müller, 1776) (imago)
   сем. Dytiscidae
@@ -177,23 +177,23 @@ raw_taxons = <<~TEXT
   Sialis sp.
   отряд Trichoptera
   сем. Polycentropodidae
-  Neureclipsis bimaculata (Linnaeus, 1758)  (о-b)
+  Neureclipsis bimaculata (Linnaeus, 1758)  (o-b)
   Cyrnus insolutus MacLachlan, 1878
   Cyrnus flavidus MacLachlan, 1864
-  Holocentropus dubius (Rambur, 1842) (о)
+  Holocentropus dubius (Rambur, 1842) (o)
   Holocentropus sp. (juv.)
   сем. Hydroptilidae  sp. (juv.)
-  Agraylea sexmaculata Curtis, 1834 (о-b)
+  Agraylea sexmaculata Curtis, 1834 (o-b)
   Hydroptila sp.
-  Oxyethira sp. (о)
+  Oxyethira sp. (o)
   Orthotrichia sp.
   Tricholeiochiton fagesii (Guinard, 1879)
   сем. Molannidae
-  Molanna angustata Curtis, 1834  (о)
+  Molanna angustata Curtis, 1834  (o)
   сем. Leptoceridae sp. (juv.)
   Athripsodes cinereus (Curtis, 1834)
   Athripsodes atherrimus (Stephens, 1836)
-  Triaenodes bicolor (Curtis, 1834) (о-b)
+  Triaenodes bicolor (Curtis, 1834) (o-b)
   Triaenodes sp.
   Oecetis sp.
   Mystacides longicornis (Linnaeus, 1758)
@@ -228,7 +228,7 @@ raw_taxons = <<~TEXT
   Tanytarsus sp.
   п/сем. Orthocladiinae n.det
   п/сем. Tanypodinae n.det.
-  сем. Simuliidae n.det. (о-b)
+  сем. Simuliidae n.det. (o-b)
   сем. Ceratopogonidae n.det.
   сем. Limoniidae
   Phylidorea sp.
@@ -252,154 +252,162 @@ raw_taxons = <<~TEXT
   сем. Syrphidae
 TEXT
 
-def normalize_source_line(line)
-  line
-    .to_s
-    .strip
-    .gsub(/\s+/, " ")
-    .sub(/\s+\*+\s*$/, "")
-    .sub(/^отр\.\s+/u, "отряд ")
-    .sub(/^п\/кл\.\s+/u, "п/класс ")
-    .gsub("Сloeon", "Cloeon")
+# отсечь ранк
+# профильтровать названия с русскими буквами
+raw_taxons.each_line.filter_map do |taxon|
+  TaxonParser.strip_prefix(taxon)
+  # raw if raw =~ /[А-Яа-я]/
 end
+  .each_with_index { |r, i| puts "#{i + 1}) #{r} ===> #{r.match(/[А-Яа-я]/).inspect}" } # rubocop:disable Rails/Output
 
-def explicit_rank_for(line)
-  case line
-  when /^тип\s+/u then :phylum
-  when /^класс\s+/u then :tclass
-  when /^п\/класс\s+/u then :subclass
-  when /^отряд\s+/u then :order
-  when /^сем\.\s+/u then :family
-  when /^п\/сем\.\s+/u then :subfamily
-  end
-end
+# def normalize_source_line(line)
+#   line
+#     .to_s
+#     .strip
+#     .gsub(/\s+/, " ")
+#     .sub(/\s+\*+\s*$/, "")
+#     .sub(/^отр\.\s+/u, "отряд ")
+#     .sub(/^п\/кл\.\s+/u, "п/класс ")
+#     .gsub("Сloeon", "Cloeon")
+# end
 
-def strip_prefix(line)
-  line
-    .sub(/^тип\s+/u, "")
-    .sub(/^класс\s+/u, "")
-    .sub(/^п\/класс\s+/u, "")
-    .sub(/^отряд\s+/u, "")
-    .sub(/^сем\.\s+/u, "")
-    .sub(/^п\/сем\.\s+/u, "")
-    .strip
-end
+# def explicit_rank_for(line)
+#   case line
+#   when /^тип\s+/u then :phylum
+#   when /^класс\s+/u then :tclass
+#   when /^п\/класс\s+/u then :subclass
+#   when /^отряд\s+/u then :order
+#   when /^п\/отряд\s+/ then :suborder
+#   when /^сем\.\s+/u then :family
+#   when /^п\/сем\.\s+/u then :subfamily
+#   end
+# end
 
-def manual_rank_for(body)
-  {
-    "Crustacea" => :tclass,
-    "Hydrachnidia n.det." => :subclass,
-    "Copepoda n.det." => :subclass,
-    "Nematoda n.det." => :phylum,
-    "Tanytarsini sp." => :family
-  }[body]
-end
+# def strip_prefix(line)
+#   line
+#     .sub(/^тип\s+/u, "")
+#     .sub(/^класс\s+/u, "")
+#     .sub(/^п\/класс\s+/u, "")
+#     .sub(/^отряд\s+/u, "")
+#     .sub(/^п\/отряд\s+/u, "")
+#     .sub(/^сем\.\s+/u, "")
+#     .sub(/^п\/сем\.\s+/u, "")
+#     .strip
+# end
 
-def family_group_placeholder?(body)
-  first_token = body.split.first.to_s
-  first_token.match?(/(idae|inae|ini)$/u)
-end
+# def manual_rank_for(body)
+#   {
+#     "Copepoda n.det." => :subclass,
+#     "Nematoda n.det." => :phylum,
+#     "Tanytarsini sp." => :family
+#   }[body]
+# end
 
-def family_group_base(body)
-  body.split.first.to_s
-end
+# def family_group_placeholder?(body)
+#   first_token = body.split.first.to_s
+#   first_token.match?(/(idae|inae|ini)$/u)
+# end
 
-def inferred_rank_for(body)
-  manual_rank_for(body) ||
-    (family_group_placeholder?(body) ? :family : :species)
-end
+# def family_group_base(body)
+#   body.split.first.to_s
+# end
 
-def rank_for(line, body)
-  explicit = explicit_rank_for(line)
-  (explicit == :subfamily) ? :family : (explicit || inferred_rank_for(body))
-end
+# def inferred_rank_for(body)
+#   manual_rank_for(body) ||
+#     (family_group_placeholder?(body) ? :family : :species)
+# end
 
-def build_name_and_full_name(body)
-  if body.include?("(")
-    [body.split("(", 2).first.rstrip, body]
-  else
-    [body, nil]
-  end
-end
+# def rank_for(line, body)
+#   explicit = explicit_rank_for(line)
+#   (explicit == :subfamily) ? :family : (explicit || inferred_rank_for(body))
+# end
 
-current = {
-  phylum: nil,
-  tclass: nil,
-  subclass: nil,
-  order: nil,
-  family: nil,
-  family_anchor: nil
-}
+# def build_name_and_full_name(body)
+#   if body.include?("(")
+#     [body.split("(", 2).first.rstrip, body]
+#   else
+#     [body, nil]
+#   end
+# end
 
-raw_taxons.each_line.filter_map { |line| normalize_source_line(line).presence }.each do |line|
-  explicit_rank = explicit_rank_for(line)
-  body = strip_prefix(line)
-  rank = rank_for(line, body)
+# current = {
+#   phylum: nil,
+#   tclass: nil,
+#   subclass: nil,
+#   order: nil,
+#   family: nil,
+#   family_anchor: nil
+# }
 
-  parent =
-    case rank
-    when :phylum
-      nil
-    when :tclass
-      current[:phylum]
-    when :subclass
-      current[:tclass] || current[:phylum]
-    when :order
-      current[:tclass] || current[:subclass] || current[:phylum]
-    when :family
-      if explicit_rank == :subfamily
-        current[:family_anchor] || current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
-      elsif body == "Tanytarsini sp."
-        current[:family] || current[:family_anchor] || current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
-      elsif family_group_placeholder?(body) &&
-          current[:family].present? &&
-          family_group_base(body) == family_group_base(current[:family].name)
-        current[:family]
-      else
-        current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
-      end
-    else
-      current[:family] || current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
-    end
+# raw_taxons.each_line.filter_map { |line| normalize_source_line(line).presence }.each do |line|
+#   explicit_rank = explicit_rank_for(line)
+#   body = strip_prefix(line)
+#   rank = rank_for(line, body)
 
-  name, full_name = build_name_and_full_name(body)
+#   parent =
+#     case rank
+#     when :phylum
+#       nil
+#     when :tclass
+#       current[:phylum]
+#     when :subclass
+#       current[:tclass] || current[:phylum]
+#     when :order
+#       current[:tclass] || current[:subclass] || current[:phylum]
+#     when :family
+#       if explicit_rank == :subfamily
+#         current[:family_anchor] || current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
+#       elsif body == "Tanytarsini sp."
+#         current[:family] || current[:family_anchor] || current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
+#       elsif family_group_placeholder?(body) &&
+#           current[:family].present? &&
+#           family_group_base(body) == family_group_base(current[:family].name)
+#         current[:family]
+#       else
+#         current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
+#       end
+#     else
+#       current[:family] || current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
+#     end
 
-  taxon = Taxon.find_or_create_by!(
-    name: name,
-    full_name: full_name,
-    rank: rank,
-    parent: parent
-  ) do |t|
-    t.name_ru = nil
-  end
+#   name, full_name = build_name_and_full_name(body)
 
-  case rank
-  when :phylum
-    current = {
-      phylum: taxon,
-      tclass: nil,
-      subclass: nil,
-      order: nil,
-      family: nil,
-      family_anchor: nil
-    }
-  when :tclass
-    current[:tclass] = taxon
-    current[:subclass] = nil
-    current[:order] = nil
-    current[:family] = nil
-    current[:family_anchor] = nil
-  when :subclass
-    current[:subclass] = taxon
-    current[:order] = nil
-    current[:family] = nil
-    current[:family_anchor] = nil
-  when :order
-    current[:order] = taxon
-    current[:family] = nil
-    current[:family_anchor] = nil
-  when :family
-    current[:family] = taxon
-    current[:family_anchor] = taxon if explicit_rank == :family
-  end
-end
+#   taxon = Taxon.find_or_create_by!(
+#     name: name,
+#     full_name: full_name,
+#     rank: rank,
+#     parent: parent
+#   ) do |t|
+#     t.name_ru = nil
+#   end
+
+#   case rank
+#   when :phylum
+#     current = {
+#       phylum: taxon,
+#       tclass: nil,
+#       subclass: nil,
+#       order: nil,
+#       family: nil,
+#       family_anchor: nil
+#     }
+#   when :tclass
+#     current[:tclass] = taxon
+#     current[:subclass] = nil
+#     current[:order] = nil
+#     current[:family] = nil
+#     current[:family_anchor] = nil
+#   when :subclass
+#     current[:subclass] = taxon
+#     current[:order] = nil
+#     current[:family] = nil
+#     current[:family_anchor] = nil
+#   when :order
+#     current[:order] = taxon
+#     current[:family] = nil
+#     current[:family_anchor] = nil
+#   when :family
+#     current[:family] = taxon
+#     current[:family_anchor] = taxon if explicit_rank == :family
+#   end
+# end

@@ -8,6 +8,7 @@ class Taxon < ApplicationRecord
     genus: 20,
     subfamily: 25,
     family: 30,
+    suborder: 35,
     order: 40,
     subclass: 45,
     tclass: 50,
