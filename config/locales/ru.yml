@@ -1,0 +1,13 @@
+ru:
+  taxon:
+    ranks:
+      r_species: ""
+      r_genus: "род"
+      r_subfamily: "п/сем."
+      r_family: "сем."
+      r_suborder: "п/отряд"
+      r_order: "отряд"
+      r_subclass: "п/класс"
+      r_class: "класс"
+      r_phylum: "тип"
+      r_kingdom: "царство"

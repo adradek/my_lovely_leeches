@@ -1,26 +1,36 @@
 module TaxonParser
-  MARKERS = {
-    "тип" => :phylum,
-    "класс" => :tclass,
-    "п/класс" => :subclass,
-    "отряд" => :order,
-    "п/отряд" => :suborder,
-    "сем." => :family,
-    "п/сем." => :subfamily
+  RANKS = {
+    "тип" => :r_phylum,
+    "класс" => :r_class,
+    "п/класс" => :r_subclass,
+    "отряд" => :r_order,
+    "п/отряд" => :r_suborder,
+    "сем." => :r_family,
+    "п/сем." => :r_subfamily
   }.freeze
+
+  MARKER_REGEX = /\A(?<marker>#{RANKS.keys.map { Regexp.escape(it) }.join("|")})\s+/u
 
   module_function
 
-  def strip_prefix(line)
-    regexp = %r{(#{MARKERS.keys.join("|")})}u
-    line.sub(regexp, "").strip
+  def find_cyrillic(line)
+    chars = line.scan(/[А-Яа-яЁё]/).uniq
+    chars.empty? ? nil : chars
   end
 
-  def typos(line)
-    line.match(/[А-Яа-я]/)
+  def normalize_line(line)
+    line.to_s.strip
+      .gsub(/\s+/, " ")
+      .sub(/\s+\*+\s*$/, "")
+      .sub(/^отр\.\s+/u, "отряд ")
+      .sub(/^п\/кл\.\s+/u, "п/класс ")
   end
 
-  def has_typos?(line)
-    typos(line).present?
+  def rank_by_marker(marker)
+    RANKS[marker] || :r_species
+  end
+
+  def split_prefix(line)
+    (m = line.match(MARKER_REGEX)) ? [m[:marker], m.post_match] : [nil, line]
   end
 end

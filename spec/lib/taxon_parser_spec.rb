@@ -4,90 +4,109 @@ require "rails_helper"
 require "taxon_parser"
 
 RSpec.describe TaxonParser do
-  describe ".strip_prefix" do
-    subject(:result) { described_class.strip_prefix(line) }
-
-    context "with a rank prefix" do
-      it "strips 'тип'" do
-        expect(described_class.strip_prefix("тип Porifera")).to eq("Porifera")
-      end
-
-      it "strips 'класс'" do
-        expect(described_class.strip_prefix("класс Insecta")).to eq("Insecta")
-      end
-
-      it "strips 'п/класс'" do
-        expect(described_class.strip_prefix("п/класс Oligochaeta sp.")).to eq("Oligochaeta sp.")
-      end
-
-      it "strips 'отряд'" do
-        expect(described_class.strip_prefix("отряд Diptera")).to eq("Diptera")
-      end
-
-      it "strips 'п/отряд'" do
-        expect(described_class.strip_prefix("п/отряд Hydrachnidia n.det.")).to eq("Hydrachnidia n.det.")
-      end
-
-      it "strips 'сем.'" do
-        expect(described_class.strip_prefix("сем. Chironomidae sp.")).to eq("Chironomidae sp.")
-      end
-
-      it "strips 'п/сем.'" do
-        expect(described_class.strip_prefix("п/сем. Chironominae sp.")).to eq("Chironominae sp.")
-      end
+  describe ".find_cyrillic" do
+    it "returns unique cyrillic characters preserving first-appearance order" do
+      expect(described_class.find_cyrillic("тип Porifera")).to eq(%w[т и п])
     end
 
-    context "without a rank prefix" do
-      it "returns the line unchanged" do
-        expect(described_class.strip_prefix("Tubifex ignotus (Stolc, 1886)")).to eq("Tubifex ignotus (Stolc, 1886)")
-      end
-
-      it "strips surrounding whitespace" do
-        expect(described_class.strip_prefix("  Hydra sp.  ")).to eq("Hydra sp.")
-      end
-
-      it "returns an empty string for a blank line" do
-        expect(described_class.strip_prefix("   ")).to eq("")
-      end
+    it "deduplicates repeated characters" do
+      expect(described_class.find_cyrillic("ааб")).to eq(%w[а б])
     end
 
-    context "with a prefix and extra whitespace" do
-      it "strips trailing whitespace from the result" do
-        expect(described_class.strip_prefix("тип  Porifera")).to eq("Porifera")
-      end
-    end
-  end
-
-  describe ".typos" do
-    it "returns a MatchData when the line contains Cyrillic characters" do
-      expect(described_class.typos("тип Porifera")).to be_a(MatchData)
+    it "recognises uppercase letters and Ё/ё" do
+      expect(described_class.find_cyrillic("Ёжик")).to eq(%w[Ё ж и к])
     end
 
-    it "returns nil when the line contains no Cyrillic characters" do
-      expect(described_class.typos("Tubifex ignotus (Stolc, 1886)")).to be_nil
+    it "returns nil when the line has no cyrillic characters" do
+      expect(described_class.find_cyrillic("Helobdella stagnalis (Linnaeus, 1758)")).to be_nil
     end
 
     it "returns nil for an empty string" do
-      expect(described_class.typos("")).to be_nil
+      expect(described_class.find_cyrillic("")).to be_nil
     end
   end
 
-  describe ".has_typos?" do
-    it "returns true when the line contains Cyrillic characters" do
-      expect(described_class.has_typos?("отряд Diptera")).to be true
+  describe ".normalize_line" do
+    it "strips surrounding whitespace" do
+      expect(described_class.normalize_line("  Hydra sp.  ")).to eq("Hydra sp.")
     end
 
-    it "returns false for a pure Latin scientific name" do
-      expect(described_class.has_typos?("Helobdella stagnalis (Linnaeus, 1758)")).to be false
+    it "collapses inner whitespace" do
+      expect(described_class.normalize_line("Hydra    sp.")).to eq("Hydra sp.")
     end
 
-    it "returns false for an empty string" do
-      expect(described_class.has_typos?("")).to be false
+    it "removes a trailing asterisk marker" do
+      expect(described_class.normalize_line("Tubifex ignotus *")).to eq("Tubifex ignotus")
     end
 
-    it "returns false after strip_prefix removes the only Cyrillic word" do
-      stripped = described_class.strip_prefix("тип Porifera")
-      expect(described_class.has_typos?(stripped)).to be false
+    it "removes multiple trailing asterisks" do
+      expect(described_class.normalize_line("Hydra sp. **")).to eq("Hydra sp.")
+    end
+
+    it "expands the 'отр.' abbreviation into 'отряд'" do
+      expect(described_class.normalize_line("отр. Diptera")).to eq("отряд Diptera")
+    end
+
+    it "expands the 'п/кл.' abbreviation into 'п/класс'" do
+      expect(described_class.normalize_line("п/кл. Oligochaeta")).to eq("п/класс Oligochaeta")
+    end
+
+    it "coerces nil into an empty string" do
+      expect(described_class.normalize_line(nil)).to eq("")
+    end
+
+    it "applies every normalization rule together" do
+      expect(described_class.normalize_line("  отр.    Diptera   * ")).to eq("отряд Diptera")
+    end
+  end
+
+  describe ".rank_by_marker" do
+    {
+      "тип" => :r_phylum,
+      "класс" => :r_class,
+      "п/класс" => :r_subclass,
+      "отряд" => :r_order,
+      "п/отряд" => :r_suborder,
+      "сем." => :r_family,
+      "п/сем." => :r_subfamily
+    }.each do |marker, rank|
+      it "maps #{marker.inspect} to #{rank.inspect}" do
+        expect(described_class.rank_by_marker(marker)).to eq(rank)
+      end
+    end
+
+    it "falls back to :r_species for an unknown marker" do
+      expect(described_class.rank_by_marker("царство")).to eq(:r_species)
+    end
+
+    it "falls back to :r_species for nil" do
+      expect(described_class.rank_by_marker(nil)).to eq(:r_species)
+    end
+  end
+
+  describe ".split_prefix" do
+    it "returns [nil, line] when there is no marker" do
+      expect(described_class.split_prefix("Helobdella stagnalis")).to eq([nil, "Helobdella stagnalis"])
+    end
+
+    it "splits a known marker off the line" do
+      expect(described_class.split_prefix("тип Annelida")).to eq(["тип", "Annelida"])
+    end
+
+    it "handles markers that contain a period" do
+      expect(described_class.split_prefix("сем. Naididae")).to eq(["сем.", "Naididae"])
+    end
+
+    it "handles multi-part markers with a slash" do
+      expect(described_class.split_prefix("п/класс Oligochaeta")).to eq(["п/класс", "Oligochaeta"])
+    end
+
+    it "tolerates multiple spaces between the marker and the body" do
+      expect(described_class.split_prefix("тип   Porifera")).to eq(["тип", "Porifera"])
+    end
+
+    it "does not match a marker that is not followed by whitespace" do
+      expect(described_class.split_prefix("типAnnelida")).to eq([nil, "типAnnelida"])
     end
   end
 end
