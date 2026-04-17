@@ -1,7 +1,12 @@
 class Taxon < ApplicationRecord
+  include Comparable
+
   belongs_to :parent, class_name: "Taxon", optional: true
 
   has_many :children, class_name: "Taxon", foreign_key: :parent_id, inverse_of: :parent
+
+  validates :name, presence: true, uniqueness: { scope: [:rank, :parent_id] }
+  validates :rank, presence: true
 
   enum :rank, {
     r_species: 10,
@@ -15,4 +20,13 @@ class Taxon < ApplicationRecord
     r_phylum: 60,
     r_kingdom: 70
   }
+
+  # TODO: change the approach, cause it makes two taxons equal when their ranks are equal
+  def <=>(other)
+    rank_num <=> other.rank_num
+  end
+
+  def rank_num
+    Taxon.ranks[rank]
+  end
 end

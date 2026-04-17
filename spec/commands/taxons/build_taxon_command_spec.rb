@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Taxons::PrepareTaxonCommand do
+RSpec.describe Taxons::BuildTaxonCommand do
   subject(:result) { described_class.call(line) }
 
   around { |example| I18n.with_locale(:en, &example) }

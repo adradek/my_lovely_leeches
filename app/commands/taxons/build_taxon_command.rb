@@ -1,5 +1,5 @@
 module Taxons
-  class PrepareTaxonCommand < ApplicationCommand
+  class BuildTaxonCommand < ApplicationCommand
     def initialize(line)
       @line = line
     end
@@ -29,11 +29,9 @@ module Taxons
     end
 
     def build_taxon(name:, rank:)
-      Taxon.new(
-        name:,
-        rank:,
-        full_name: [I18n.t("taxon.ranks.#{rank}"), name].compact_blank.join(" ")
-      )
+      Taxon.find_or_initialize_by(name:, rank:) do |t|
+        t.full_name = [I18n.t("taxon.ranks.#{rank}"), name].compact_blank.join(" ")
+      end
     end
 
     def normalize_line
