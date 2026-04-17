@@ -15,6 +15,12 @@ FileUtils.chdir APP_ROOT do
   puts "== Installing dependencies =="
   system("bundle check") || system!("bundle install")
 
+  Dir.glob("gemfiles/*.gemfile").sort.each do |gemfile|
+    puts "== Installing #{gemfile} =="
+    env = { "BUNDLE_GEMFILE" => gemfile }
+    system(env, "bundle", "check") || system!(env, "bundle", "install")
+  end
+
   # Install JavaScript dependencies
   system("yarn install --check-files")
 

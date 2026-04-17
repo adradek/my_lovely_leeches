@@ -21,6 +21,7 @@ class Taxon < ApplicationRecord
     r_kingdom: 70
   }
 
+  # TODO: change the approach, cause it makes two taxons equal when their ranks are equal
   def <=>(other)
     rank_num <=> other.rank_num
   end
