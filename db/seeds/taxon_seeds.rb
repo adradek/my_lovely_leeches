@@ -26,7 +26,7 @@ raw_taxons = <<~TEXT
   п/класс Oligochaeta sp.
   сем. Naididae sp.
   Chaetogaster sp.
-  Ophidonais serpentina (Müller, 1774)?
+  Ophidonais serpentina (Müller, 1774)
   Stylaria lacustris (Linnaeus, 1767) (b)
   Ripistes parasita (Schmidt, 1847)
   Dero sp.

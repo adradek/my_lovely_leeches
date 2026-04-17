@@ -1,0 +1,22 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6 text-gray-900">Taxons</h1>
+
+  <ul class="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white shadow-sm">
+    <% @taxons.each do |taxon| %>
+      <li class="flex items-center px-4 py-3 hover:bg-gray-50">
+        <span class="font-medium text-gray-900 mr-1">
+          <%= ("&nbsp;&nbsp;" * ((60 - taxon.rank_num) / 5)).html_safe %>
+        </span>
+        <span class="text-blue-700 mr-1">
+          <%= I18n.t("taxon.ranks.#{taxon.rank}") %>
+        </span>
+        <span class="mr-2">
+          <%= taxon.name %>
+        </span>
+        <span class="text-sm text-green-600">
+          <%= "(" + [taxon.id, taxon.parent_id].compact.map { "##{it}" }.join(" → ") + ")" %>
+        </span>
+      </li>
+    <% end %>
+  </ul>
+</div>

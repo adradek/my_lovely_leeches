@@ -38,5 +38,8 @@ module MyLovelyLeeches
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.i18n.default_locale = :ru
+    config.i18n.available_locales = [:ru, :en]
   end
 end
