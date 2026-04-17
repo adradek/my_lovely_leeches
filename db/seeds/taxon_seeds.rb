@@ -252,162 +252,22 @@ raw_taxons = <<~TEXT
   сем. Syrphidae
 TEXT
 
-# отсечь ранк
-# профильтровать названия с русскими буквами
-raw_taxons.each_line.filter_map do |taxon|
-  TaxonParser.strip_prefix(taxon)
-  # raw if raw =~ /[А-Яа-я]/
+I18n.with_locale(:ru) do
+  parents = []
+
+  raw_taxons.each_line do |line|
+    result = Taxons::BuildTaxonCommand.call(line)
+    unless result.success?
+      puts "\n\n\nСкипаем таксон #{line}, ибо: #{result.inspect}\n\n\n" # rubocop:disable Rails/Output
+      next
+    end
+
+    taxon = result.value!
+
+    parents.pop while parents.last && parents.last <= taxon
+    taxon.parent ||= parents.last if parents.last
+    parents.push(taxon) if taxon.rank != :r_species
+
+    taxon.save! if taxon.changed? || taxon.new_record?
+  end
 end
-  .each_with_index { |r, i| puts "#{i + 1}) #{r} ===> #{r.match(/[А-Яа-я]/).inspect}" } # rubocop:disable Rails/Output
-
-# def normalize_source_line(line)
-#   line
-#     .to_s
-#     .strip
-#     .gsub(/\s+/, " ")
-#     .sub(/\s+\*+\s*$/, "")
-#     .sub(/^отр\.\s+/u, "отряд ")
-#     .sub(/^п\/кл\.\s+/u, "п/класс ")
-#     .gsub("Сloeon", "Cloeon")
-# end
-
-# def explicit_rank_for(line)
-#   case line
-#   when /^тип\s+/u then :phylum
-#   when /^класс\s+/u then :tclass
-#   when /^п\/класс\s+/u then :subclass
-#   when /^отряд\s+/u then :order
-#   when /^п\/отряд\s+/ then :suborder
-#   when /^сем\.\s+/u then :family
-#   when /^п\/сем\.\s+/u then :subfamily
-#   end
-# end
-
-# def strip_prefix(line)
-#   line
-#     .sub(/^тип\s+/u, "")
-#     .sub(/^класс\s+/u, "")
-#     .sub(/^п\/класс\s+/u, "")
-#     .sub(/^отряд\s+/u, "")
-#     .sub(/^п\/отряд\s+/u, "")
-#     .sub(/^сем\.\s+/u, "")
-#     .sub(/^п\/сем\.\s+/u, "")
-#     .strip
-# end
-
-# def manual_rank_for(body)
-#   {
-#     "Copepoda n.det." => :subclass,
-#     "Nematoda n.det." => :phylum,
-#     "Tanytarsini sp." => :family
-#   }[body]
-# end
-
-# def family_group_placeholder?(body)
-#   first_token = body.split.first.to_s
-#   first_token.match?(/(idae|inae|ini)$/u)
-# end
-
-# def family_group_base(body)
-#   body.split.first.to_s
-# end
-
-# def inferred_rank_for(body)
-#   manual_rank_for(body) ||
-#     (family_group_placeholder?(body) ? :family : :species)
-# end
-
-# def rank_for(line, body)
-#   explicit = explicit_rank_for(line)
-#   (explicit == :subfamily) ? :family : (explicit || inferred_rank_for(body))
-# end
-
-# def build_name_and_full_name(body)
-#   if body.include?("(")
-#     [body.split("(", 2).first.rstrip, body]
-#   else
-#     [body, nil]
-#   end
-# end
-
-# current = {
-#   phylum: nil,
-#   tclass: nil,
-#   subclass: nil,
-#   order: nil,
-#   family: nil,
-#   family_anchor: nil
-# }
-
-# raw_taxons.each_line.filter_map { |line| normalize_source_line(line).presence }.each do |line|
-#   explicit_rank = explicit_rank_for(line)
-#   body = strip_prefix(line)
-#   rank = rank_for(line, body)
-
-#   parent =
-#     case rank
-#     when :phylum
-#       nil
-#     when :tclass
-#       current[:phylum]
-#     when :subclass
-#       current[:tclass] || current[:phylum]
-#     when :order
-#       current[:tclass] || current[:subclass] || current[:phylum]
-#     when :family
-#       if explicit_rank == :subfamily
-#         current[:family_anchor] || current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
-#       elsif body == "Tanytarsini sp."
-#         current[:family] || current[:family_anchor] || current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
-#       elsif family_group_placeholder?(body) &&
-#           current[:family].present? &&
-#           family_group_base(body) == family_group_base(current[:family].name)
-#         current[:family]
-#       else
-#         current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
-#       end
-#     else
-#       current[:family] || current[:order] || current[:subclass] || current[:tclass] || current[:phylum]
-#     end
-
-#   name, full_name = build_name_and_full_name(body)
-
-#   taxon = Taxon.find_or_create_by!(
-#     name: name,
-#     full_name: full_name,
-#     rank: rank,
-#     parent: parent
-#   ) do |t|
-#     t.name_ru = nil
-#   end
-
-#   case rank
-#   when :phylum
-#     current = {
-#       phylum: taxon,
-#       tclass: nil,
-#       subclass: nil,
-#       order: nil,
-#       family: nil,
-#       family_anchor: nil
-#     }
-#   when :tclass
-#     current[:tclass] = taxon
-#     current[:subclass] = nil
-#     current[:order] = nil
-#     current[:family] = nil
-#     current[:family_anchor] = nil
-#   when :subclass
-#     current[:subclass] = taxon
-#     current[:order] = nil
-#     current[:family] = nil
-#     current[:family_anchor] = nil
-#   when :order
-#     current[:order] = taxon
-#     current[:family] = nil
-#     current[:family_anchor] = nil
-#   when :family
-#     current[:family] = taxon
-#     current[:family_anchor] = taxon if explicit_rank == :family
-#   end
-# end

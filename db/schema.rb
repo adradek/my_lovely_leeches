@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_14_111336) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_17_140015) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_111336) do
     t.bigint "parent_id"
     t.integer "rank", default: 10, null: false
     t.datetime "updated_at", null: false
+    t.index ["name", "rank", "parent_id"], name: "index_taxons_on_name_and_rank_and_parent_id", unique: true, nulls_not_distinct: true
     t.index ["parent_id"], name: "index_taxons_on_parent_id"
   end
 
