@@ -4,15 +4,15 @@ class Taxon < ApplicationRecord
   has_many :children, class_name: "Taxon", foreign_key: :parent_id, inverse_of: :parent
 
   enum :rank, {
-    species: 10,
-    genus: 20,
-    subfamily: 25,
-    family: 30,
-    suborder: 35,
-    order: 40,
-    subclass: 45,
-    tclass: 50,
-    phylum: 60,
-    kingdom: 70
+    r_species: 10,
+    r_genus: 20,
+    r_subfamily: 25,
+    r_family: 30,
+    r_suborder: 35,
+    r_order: 40,
+    r_subclass: 45,
+    r_class: 50,
+    r_phylum: 60,
+    r_kingdom: 70
   }
 end
