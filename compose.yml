@@ -13,6 +13,7 @@ services:
       - database
     tty: true
     stdin_open: true
+    command: bin/dev
 
   database:
     image: postgres:18
