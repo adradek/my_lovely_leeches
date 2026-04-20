@@ -45,6 +45,8 @@ gem "dry-monads"
 gem "dry-validation"
 gem "http_accept_language"
 
+gem "rdoc", "7.0.3"
+
 group :development, :test do
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
   gem "bundler-audit", require: false
