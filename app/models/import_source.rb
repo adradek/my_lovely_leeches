@@ -3,7 +3,7 @@ class ImportSource < ApplicationRecord
   has_one_attached :source
 
   validates :name, presence: true
-  validates :type, presence: true
+  validates :format, presence: true
 
-  enum :type, { json: 0, csv: 1, xsl: 2, xslx: 3 }
+  enum :format, { json: 0, csv: 1, xsl: 2, xslx: 3 }
 end

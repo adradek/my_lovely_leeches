@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_193335) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_133913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -44,9 +44,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_193335) do
 
   create_table "import_sources", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.integer "format", default: 0, null: false
     t.jsonb "memo"
     t.string "name", null: false
-    t.integer "type", default: 0, null: false
     t.datetime "updated_at", null: false
   end
 
