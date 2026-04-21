@@ -13,7 +13,7 @@ services:
       - database
     tty: true
     stdin_open: true
-    command: bin/dev
+    command: bin/rails s -b 0.0.0.0
 
   database:
     image: postgres:18
