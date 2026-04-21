@@ -1,0 +1,62 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Import #<%= @import.id %></h1>
+    <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+      <%= @import.status.humanize %>
+    </span>
+  </div>
+
+  <dl class="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div class="grid grid-cols-3 gap-4 px-4 py-3">
+      <dt class="text-sm font-medium text-gray-500">Place</dt>
+      <dd class="col-span-2 text-sm text-gray-900"><%= @import.place.presence || "—" %></dd>
+    </div>
+    <div class="grid grid-cols-3 gap-4 px-4 py-3">
+      <dt class="text-sm font-medium text-gray-500">Point</dt>
+      <dd class="col-span-2 text-sm text-gray-900"><%= @import.point.presence || "—" %></dd>
+    </div>
+    <div class="grid grid-cols-3 gap-4 px-4 py-3">
+      <dt class="text-sm font-medium text-gray-500">Section</dt>
+      <dd class="col-span-2 text-sm text-gray-900"><%= @import.section.presence || "—" %></dd>
+    </div>
+    <div class="grid grid-cols-3 gap-4 px-4 py-3">
+      <dt class="text-sm font-medium text-gray-500">Collected on</dt>
+      <dd class="col-span-2 text-sm text-gray-900">
+        <%= @import.collected_on ? l(@import.collected_on, format: :long) : "—" %>
+      </dd>
+    </div>
+    <div class="grid grid-cols-3 gap-4 px-4 py-3">
+      <dt class="text-sm font-medium text-gray-500">Source</dt>
+      <dd class="col-span-2 text-sm text-gray-900">
+        <% source = @import.import_source %>
+        <div>
+          <span class="font-medium">#<%= source.id %></span>
+          <span class="text-gray-600">— <%= source.format %></span>
+          <% if source.name.present? %>
+            <span class="text-gray-600">(<%= source.name %>)</span>
+          <% end %>
+        </div>
+        <% if source.source.attached? %>
+          <div class="mt-1">
+            <%= link_to source.source.filename.to_s, url_for(source.source),
+                        class: "text-blue-700 hover:underline" %>
+            <span class="text-xs text-gray-500 ml-1">
+              (<%= number_to_human_size(source.source.byte_size) %>)
+            </span>
+          </div>
+        <% end %>
+      </dd>
+    </div>
+    <div class="grid grid-cols-3 gap-4 px-4 py-3">
+      <dt class="text-sm font-medium text-gray-500">Created at</dt>
+      <dd class="col-span-2 text-sm text-gray-900"><%= @import.created_at %></dd>
+    </div>
+  </dl>
+
+  <div class="mt-6 flex items-center gap-3">
+    <%= link_to "New Import", new_import_path,
+                class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700" %>
+    <%= link_to "Back to Imports", imports_path,
+                class: "text-sm font-medium text-gray-600 hover:text-gray-900" %>
+  </div>
+</div>

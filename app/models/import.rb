@@ -3,11 +3,5 @@ class Import < ApplicationRecord
 
   validates :status, presence: true
 
-  enum :status, {
-    initial: 0,
-    in_progress: 1,
-    parsed: 2,
-    completed: 3,
-    failed: 4
-  }
+  enum :status, { initial: 0, sourced: 1, parsed: 2, completed: 3, failed: 4 }
 end
