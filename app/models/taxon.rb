@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: taxons
+#
+#  id         :bigint           not null, primary key
+#  full_name  :string
+#  name       :string           not null
+#  name_ru    :string
+#  rank       :integer          default("r_species"), not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  parent_id  :bigint
+#
+# Indexes
+#
+#  index_taxons_on_name_and_rank_and_parent_id  (name,rank,parent_id) UNIQUE NULLS NOT DISTINCT
+#  index_taxons_on_parent_id                    (parent_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (parent_id => taxons.id)
+#
 class Taxon < ApplicationRecord
   include Comparable
 

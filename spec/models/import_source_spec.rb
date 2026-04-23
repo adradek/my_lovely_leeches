@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: import_sources
+#
+#  id         :bigint           not null, primary key
+#  format     :integer          default("json"), not null
+#  memo       :jsonb
+#  name       :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
 require "rails_helper"
 
 RSpec.describe ImportSource, type: :model do
