@@ -1,7 +1,9 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require "spec_helper"
+
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
+
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 # Uncomment the line below in case you have `--require rails_helper` in the `.rspec` file
@@ -22,8 +24,8 @@ require "rspec/rails"
 # of increasing the boot-up time by auto-requiring all files in the support
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
-#
-# Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
+
+Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |f| require f }
 
 # Ensures that the test database schema matches the current schema file.
 # If there are pending migrations it will invoke `db:test:prepare` to
@@ -34,11 +36,21 @@ begin
 rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
+
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_paths = [
-    Rails.root.join("spec/fixtures")
-  ]
+  config.fixture_paths = [Rails.root.join("spec/fixtures")]
+
+  config.include ActionDispatch::TestProcess::FixtureFile
+
+  config.after(:suite) do
+    service = ActiveStorage::Blob.service
+    if service.respond_to?(:root)
+      Pathname.new(service.root).glob("*").reject { it.basename.to_s == ".keep" }.each do |entry|
+        FileUtils.rm_rf(entry)
+      end
+    end
+  end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
