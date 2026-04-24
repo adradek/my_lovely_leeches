@@ -7,29 +7,50 @@ RSpec.describe ImportSourceBuilder::Excel do
   let(:file) { nil }
 
   describe "#build" do
-    pending "returns an ImportSource"
     pending "sets format to :excel"
     pending "extracts metadata into memo"
 
-    context "with xls file" do
-      # .xls → application/vnd.ms-excel
-      # .xlsx → application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-      # .xlsm (с макросами) → application/vnd.ms-excel.sheet.macroEnabled.12
-      # .xlsb (binary) → application/vnd.ms-excel.sheet.binary.macroEnabled.12
-      let(:file) { fixture_file_better_upload("sample.xls") }
-      let(:name) { "Simple Excel File" }
-      let(:persisted_instance) { builder_call }
+    context "with valid input parameters" do
+      context "when file has .xls extension" do
+        let(:filename) { "sample.xls" }
+        let(:file) { fixture_file_better_upload(filename) }
+        let(:name) { "Simple Excel File" }
+        let(:value) { builder_call.value! }
 
-      it "creates an ImportSource with format :xsl" do
-        expect { builder_call }.to change(ImportSource, :count).by(1)
-      end
+        it "returns Success" do
+          expect(builder_call).to be_success
+        end
 
-      it "assigns specified name to the persisted instance" do
-        expect(persisted_instance.name).to eq(name)
-      end
+        it "creates an ImportSource with format :xsl" do
+          expect { builder_call }.to change(ImportSource, :count).by(1)
+        end
 
-      it "assigns format :xls to the persisted instance" do
-        expect(persisted_instance.format).to eq("xls")
+        it "wraps the created ImportSource instance inside the returned value" do
+          expect(value).to be_a(ImportSource)
+        end
+
+        it "assigns specified name to the persisted instance" do
+          expect(value.name).to eq(name)
+        end
+
+        it "assigns format :xls to the persisted instance" do
+          expect(value.format).to eq("xls")
+        end
+
+        # rubocop:disable RSpec/ExampleLength
+        it "attaches the file to the persisted instance", :aggregate_failures do
+          expect(value.source).to be_attached
+
+          value.source.blob.tap do |blob|
+            expect(blob.filename).to eq(file.original_filename)
+            expect(blob.content_type).to eq(file.content_type)
+            expect(blob.byte_size).to eq(file.size)
+            expect(blob.checksum).to eq(
+              Digest::MD5.base64digest(File.binread(fixture_file_path(filename)))
+            )
+          end
+        end
+        # rubocop:enable RSpec/ExampleLength
       end
     end
   end
