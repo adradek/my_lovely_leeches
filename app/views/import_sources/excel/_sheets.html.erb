@@ -1,0 +1,22 @@
+<div class="mt-5">
+  <h3 class="text-lg font-medium text-gray-900">Sheets</h3>
+
+  <div data-controller="sheet">
+    <div class="my-2">
+      <% sheets.each_with_index do |sheet, index| %>
+        <button type="button" class="px-2 py-1 rounded-md"
+          data-sheet-target="sheetButton" data-action="click->sheet#selectSheet"
+          data-sheet-index-param="<%= index %>">
+
+          <%= sheet[:name] %>
+        </button>
+      <% end %>
+    </div>
+
+    <div data-sheet-target="table"></div>
+
+    <script type="application/json" data-sheet-target="data">
+      <%= raw json_escape(sheets.to_json) %>
+    </script>
+  </div>
+</div>

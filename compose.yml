@@ -1,19 +1,26 @@
+x-app: &app
+  build: .
+  volumes:
+    - .:/usr/src/app
+    - gem_cache:/usr/local/bundle
+  env_file:
+    - .envdir/development/database
+    - .envdir/development/web
+
 services:
+  watcher:
+    <<: *app
+    command: bin/watcher
+
   web:
-    build: .
+    <<: *app
     ports:
       - 3000:3000
-    volumes:
-      - .:/usr/src/app
-      - gem_cache:/usr/local/bundle
-    env_file:
-      - .envdir/development/database
-      - .envdir/development/web
-    depends_on:
-      - database
     tty: true
     stdin_open: true
-    command: bin/dev
+    command: bin/rails s -b 0.0.0.0
+    depends_on:
+    - database
 
   database:
     image: postgres:18

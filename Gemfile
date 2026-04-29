@@ -44,11 +44,15 @@ gem "image_processing", "~> 1.2"
 gem "dry-monads"
 gem "dry-validation"
 gem "http_accept_language"
+gem "roo", "~> 3.0.0"
+gem "roo-xls"
+gem "aasm"
 
 gem "rdoc", "7.0.3"
 
 group :development, :test do
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
+  gem "pry-byebug"
   gem "bundler-audit", require: false
   gem "brakeman", require: false
   gem "rspec-rails"
@@ -57,4 +61,5 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  gem "annotaterb"
 end
