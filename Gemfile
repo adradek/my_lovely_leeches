@@ -48,7 +48,7 @@ gem "roo", "~> 3.0.0"
 gem "roo-xls"
 gem "aasm"
 
-gem "rdoc", "7.0.3"
+gem "rdoc", "7.2.0"
 
 group :development, :test do
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
