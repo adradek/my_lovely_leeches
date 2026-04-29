@@ -4,13 +4,16 @@ class ImportsController < ApplicationController
   end
 
   def create
-    import_source = ImportSource.create!(format: :xslx, name: "placeholder")
-    import_source.source.attach(params[:import][:file])
+    # import_source = ImportSource.create!(format: :xslx, name: "placeholder")
+    # import_source.source.attach(params[:import][:file])
 
-    @import = Import.new(import_params)
-    @import.import_source = import_source
+    # @import = Import.new(import_params)
+    # @import.import_source = import_source
 
-    if @import.save
+    result = Imports::CreateImportCommand.call(name: "placeholder", file: params[:import][:file])
+
+    if result.success?
+      @import = result.value!
       redirect_to @import, notice: "Import created successfully"
     else
       render :new

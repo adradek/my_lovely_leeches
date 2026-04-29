@@ -7,7 +7,7 @@
 #  place            :string
 #  point            :string
 #  section          :string
-#  status           :integer          default("initial"), not null
+#  state            :integer          default("initial"), not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  import_source_id :bigint           not null

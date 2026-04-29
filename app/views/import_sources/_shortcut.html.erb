@@ -1,0 +1,26 @@
+<dl class="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white shadow-sm mt-4">
+  <div class="grid grid-cols-3 gap-4 px-4 py-3">
+    <dt class="text-sm font-medium text-gray-500">Source</dt>
+    <dd class="col-span-2 text-sm text-gray-900">
+      <div>
+        <span class="font-medium">#<%= import_source.id %></span>
+        <span class="text-gray-600">— <%= import_source.format %></span>
+        <% if import_source.name.present? %>
+          <span class="text-gray-600">(<%= import_source.name %>)</span>
+        <% end %>
+      </div>
+
+      <% if import_source.source.attached? %>
+        <div class="mt-1">
+          <%= link_to import_source.source.filename.to_s, url_for(import_source.source),
+                      class: "text-blue-700 hover:underline" %>
+          <span class="text-xs text-gray-500 ml-1">
+            (<%= number_to_human_size(import_source.source.byte_size) %>)
+          </span>
+        </div>
+      <% end %>
+    </dd>
+  </div>
+</dl>
+
+<%= render_sheets(import_source) %>
