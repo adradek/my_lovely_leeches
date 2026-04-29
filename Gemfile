@@ -46,6 +46,7 @@ gem "dry-validation"
 gem "http_accept_language"
 gem "roo", "~> 3.0.0"
 gem "roo-xls"
+gem "aasm"
 
 gem "rdoc", "7.0.3"
 
