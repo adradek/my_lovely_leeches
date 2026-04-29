@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_133913) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_24_120409) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,7 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_133913) do
     t.string "place"
     t.string "point"
     t.string "section"
-    t.integer "status", default: 0, null: false
+    t.integer "state", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["import_source_id"], name: "index_imports_on_import_source_id"
   end

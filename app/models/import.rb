@@ -7,7 +7,7 @@
 #  place            :string
 #  point            :string
 #  section          :string
-#  status           :integer          default("initial"), not null
+#  state            :integer          default("initial"), not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  import_source_id :bigint           not null
@@ -21,9 +21,35 @@
 #  fk_rails_...  (import_source_id => import_sources.id)
 #
 class Import < ApplicationRecord
+  include AASM
+
   belongs_to :import_source
 
-  validates :status, presence: true
+  enum :state, { initial: 0, sourced: 1, determined: 2, parsed: 3, completed: 4, failed: 5 },
+    instance_methods: false, scopes: false
 
-  enum :status, { initial: 0, sourced: 1, parsed: 2, completed: 3, failed: 4 }
+  aasm column: :state, enum: true do
+    state :initial, initial: true
+    state :sourced, :determined, :parsed, :completed, :failed
+
+    event :source do
+      transitions from: :initial, to: :sourced
+    end
+
+    event :determine do
+      transitions from: :sourced, to: :determined
+    end
+
+    event :parse do
+      transitions from: :determined, to: :parsed
+    end
+
+    event :complete do
+      transitions from: :parsed, to: :completed
+    end
+
+    event :fail do
+      transitions from: %i[sourced parsed], to: :failed
+    end
+  end
 end
