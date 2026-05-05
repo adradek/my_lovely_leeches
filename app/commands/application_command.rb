@@ -4,6 +4,6 @@ class ApplicationCommand
   def self.call(...) = new(...).call
 
   def call
-    raise NotImplementedError
+    raise NotImplementedError, "#call method should be implemented in the #{self.class} subclass"
   end
 end

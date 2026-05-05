@@ -13,8 +13,8 @@ class ImportSource < ApplicationRecord
   has_many :imports, dependent: :restrict_with_exception
   has_one_attached :source
 
+  validates :memo, presence: true, if: :raw?
   validates :name, presence: true
-  validates :format, presence: true
 
   enum :format, { raw: 0, csv: 1, xls: 2, xlsx: 3 }
 end
