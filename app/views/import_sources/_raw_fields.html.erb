@@ -1,0 +1,13 @@
+<div class="space-y-2" data-controller="raw-sheet">
+  <%= label_tag :raw_data, "Raw data",
+                class: "block text-sm font-medium text-gray-700" %>
+
+  <div data-raw-sheet-target="table"
+       class="border border-gray-300 rounded-md overflow-auto"></div>
+
+  <%= f.hidden_field :raw_memo, data: { raw_sheet_target: "input" } %>
+
+  <p class="text-xs text-gray-500">
+    Введите данные прямо в таблицу. Используйте контекстное меню для добавления/удаления строк и столбцов.
+  </p>
+</div>

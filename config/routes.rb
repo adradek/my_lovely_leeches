@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  resources :import_sources
   resources :imports
   resources :taxons
 end

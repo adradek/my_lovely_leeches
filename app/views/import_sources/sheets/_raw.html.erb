@@ -1,0 +1,9 @@
+<div class="mt-5">
+  <div data-controller="sheet">
+    <div data-sheet-target="table"></div>
+
+    <script type="application/json" data-sheet-target="data">
+      <%= raw json_escape(sheets.to_json) %>
+    </script>
+  </div>
+</div>

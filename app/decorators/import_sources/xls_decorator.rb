@@ -10,8 +10,17 @@ module ImportSources
       end
     end
 
+    def get_sheets
+      import_source.source.open { file_to_matrix(it) }
+    end
+
     def valid_format?
       import_source.xls?
+    end
+
+    def validate_import_source
+      super
+      file_attached?
     end
   end
 end

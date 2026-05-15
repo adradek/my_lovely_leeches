@@ -9,3 +9,9 @@ application.register("hello", HelloController)
 
 import SheetController from "./sheet_controller"
 application.register("sheet", SheetController)
+
+import FormatSwitchController from "./format_switch_controller"
+application.register("format-switch", FormatSwitchController)
+
+import RawSheetController from "./raw_sheet_controller"
+application.register("raw-sheet", RawSheetController)
